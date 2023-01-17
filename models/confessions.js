@@ -5,9 +5,7 @@ const confessionSchema=mongoose.Schema({
     username:{
         type:String,
         require:true,
-        min:3,
-        max:20,
-        unique:true
+       
 
 
 
@@ -18,6 +16,11 @@ const confessionSchema=mongoose.Schema({
         require:true
 
 
+    },
+    theme:{
+        type:String,
+        require:true,
+        default:"eight"
     }
 
    

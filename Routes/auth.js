@@ -1,12 +1,13 @@
 const router=require('express').Router();
 const users = require("../models/users");
+// const confessions = require("../models/confessions");
 const bcrypt = require("bcryptjs");
 router.post("/signup",async(req,res)=>{
 try{
     console.log("singn up");
 
     const user = await users.findOne({$or:[ {username: req.body.username},{email:req.body.email}]});
-    console.log(user)
+   
 if(user){{
     res.status(403).json(403);
     return;
@@ -21,6 +22,7 @@ const hashedPassword = await bcrypt.hash(req.body.password, salt);
   
       });
       const useraa = await newUser.save();
+
       res.status(200).json(useraa);
     }
     catch(err) {{
@@ -34,7 +36,7 @@ router.post("/login",async(req,res)=>{
     try{
         console.log("login up");
     
-        const user = await users.findOne({$and:[ {username: req.body.username},{email:req.body.email}]});
+        const user = await users.findOne({"email":req.body.email});
         console.log(user)
     if(!user){{
         res.status(403).json(403);
@@ -61,5 +63,25 @@ return;
         }}
     
     })
+
+
+router.post("/getuser",async(req,res)=>{
+
+try{
+    const username=await users.findOne({"username":req.body.username});
+    if(!username)
+    {
+return res.status(403).json(403);
+
+    }
+    return res.status(200).json(username);
+}
+catch(err)
+{
+    return res.status(500).json(500);
+
+}
+
+})
     
 module.exports=router;
