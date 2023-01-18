@@ -68,7 +68,7 @@ return;
 router.post("/getuser",async(req,res)=>{
 
 try{
-    const username=await users.findOne({"username":req.body.username});
+    const username=await users.findById(req.body.id);
     if(!username)
     {
 return res.status(403).json(403);
@@ -83,5 +83,69 @@ catch(err)
 }
 
 })
+
+router.post("/getwriteuser",async(req,res)=>{
+
+    try{
+        const username=await users.findOne({"username":req.body.username});
+        if(!username)
+        {
+    return res.status(403).json(403);
     
+        }
+        return res.status(200).json(username);
+    }
+    catch(err)
+    {
+        return res.status(500).json(500);
+    
+    }
+    
+    })
+
+router.post("/updateprofile",async(req, res)=>{
+
+    try{
+        console.log(req.body.id)
+const result= await users.findByIdAndUpdate(req.body.id,req.body.userinfo);
+res.status(200).json(result);
+console.log(result)
+    }catch(err){
+        res.status(500).json(500);
+        console.log("errr")
+    }
+
+})
+    
+
+// work
+
+router.post("/resetpass",async(req,res)=>{
+
+    try{
+        console.log("-------")
+        console.log(req.body.id)
+console.log(req.body.id, req.body.oldpassword,req.body.password)
+        const user = await users.findById(req.body.id);
+        const validPassword = await bcrypt.compare(
+            req.body.oldpassword,
+            user.password
+          );
+          if(!validPassword)
+          {
+           
+return res.status(403).json(403)
+          }
+          const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            const result= await users.findByIdAndUpdate(req.body.id,{"password":hashedPassword});
+            return res.status(200).json(200)
+
+
+    }catch(err){{
+
+        return res.status(500).json(500)
+    }}
+})
+
 module.exports=router;
