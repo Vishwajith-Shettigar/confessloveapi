@@ -1,6 +1,6 @@
 const router=require('express').Router();
 const users = require("../models/users");
-// const confessions = require("../models/confessions");
+const confessions = require("../models/confessions");
 const bcrypt = require("bcryptjs");
 router.post("/signup",async(req,res)=>{
 try{
@@ -106,8 +106,32 @@ router.post("/getwriteuser",async(req,res)=>{
 router.post("/updateprofile",async(req, res)=>{
 
     try{
+
+        const user = await users.findOne({"username": req.body.userinfo.username});
+   
+        if(user){{
+            res.status(403).json(403);
+            return;
+        }}
+
         console.log(req.body.id)
+        const oldusernames = await users.findById(req.body.id);
 const result= await users.findByIdAndUpdate(req.body.id,req.body.userinfo);
+console.log(oldusernames.username);
+
+const conv=await confessions.updateMany(
+    {
+        username:oldusernames.username
+      },
+    {
+        $set:
+        {
+            username:req.body.userinfo.username
+          }
+      }
+      )
+
+console.log("------------")
 res.status(200).json(result);
 console.log(result)
     }catch(err){
